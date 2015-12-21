@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd
+	         http://www.springframework.org/schema/tx
+ 			 http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+ 			 http://www.springframework.org/schema/context
+ 			 http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 自动扫描 -->
+    <context:component-scan base-package="com.ihefe.nurses"/>
+
+    <!-- 引入配置文件 -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:database.properties" />
+    </bean>
+
+    <!-- mysql start -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${jdbc.checkoutTimeout}" />		<!-- 获取新连接的超时时间为10000毫秒 -->
+    </bean>
+
+    <!-- 事务管理 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" ></tx:annotation-driven>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath:mapper/mysql/**/*.xml" />
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.dao.*" />
+    </bean>
+    <!-- mysql end-->
+
+    <!-- sqlserver start-->
+    <bean id="dataSource2" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${DS2.jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${DS2.jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${DS2.jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${DS2.jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${DS2.jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${DS2.jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${DS2.jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${DS2.jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${DS2.jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${DS2.jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${DS2.jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${DS2.jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${DS2.jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${DS2.jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${DS2.jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+         <property name="checkoutTimeout" value="${DS2.jdbc.checkoutTimeout}" /> 	<!-- 获取新连接的超时时间为10000毫秒-->
+    </bean>
+
+    <bean id="sqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource2" />
+        <property name="mapperLocations" value="classpath:mapper/others/sqlserver/*.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory2"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.adapter.sqlserver.dao.*" />
+    </bean>
+    <!-- 事务管理 -->
+    <bean id="transactionManager2"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource2" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager2" ></tx:annotation-driven>
+    <!--sqlserver end -->
+
+    <!-- sqlserver2 start-->
+    <bean id="dataSource3" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${DS3.jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${DS3.jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${DS3.jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${DS3.jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${DS3.jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${DS3.jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${DS3.jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${DS3.jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${DS3.jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${DS3.jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${DS3.jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${DS3.jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${DS3.jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${DS3.jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${DS3.jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${DS3.jdbc.checkoutTimeout}" /> 	<!-- 获取新连接的超时时间为10000毫秒-->
+    </bean>
+
+    <bean id="sqlSessionFactory3" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource3" />
+        <property name="mapperLocations" value="classpath:mapper/others/sqlserver2/*.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory3"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.adapter.sqlserver2.dao" />
+    </bean>
+    <!-- 事务管理 -->
+    <bean id="transactionManager3"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource3" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager3" ></tx:annotation-driven>
+    <!--sqlserver2 end -->
+
+    <!-- sqlserver3 start-->
+    <bean id="dataSource4" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${DS4.jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${DS4.jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${DS4.jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${DS4.jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${DS4.jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${DS4.jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${DS4.jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${DS4.jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${DS4.jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${DS4.jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${DS4.jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${DS4.jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${DS4.jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${DS4.jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${DS4.jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${DS4.jdbc.checkoutTimeout}" /> 	<!-- 获取新连接的超时时间为10000毫秒-->
+    </bean>
+
+    <bean id="sqlSessionFactory4" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource4" />
+        <property name="mapperLocations" value="classpath:mapper/others/sqlserver3/*.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory4"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.adapter.sqlserver3.dao" />
+    </bean>
+    <!-- 事务管理 -->
+    <bean id="transactionManager4"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource4" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager4" ></tx:annotation-driven>
+    <!--sqlserver3 end -->
+
+    <!-- sqlserver4 start-->
+    <bean id="dataSource5" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${DS5.jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${DS5.jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${DS5.jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${DS5.jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${DS5.jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${DS5.jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${DS5.jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${DS5.jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${DS5.jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${DS5.jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${DS5.jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${DS5.jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${DS5.jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${DS5.jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${DS5.jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${DS5.jdbc.checkoutTimeout}" /> 	<!-- 获取新连接的超时时间为10000毫秒-->
+    </bean>
+
+    <bean id="sqlSessionFactory5" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource5" />
+        <property name="mapperLocations" value="classpath:mapper/others/sqlserver4/*.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory5"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.adapter.sqlserver4.dao" />
+    </bean>
+    <!-- 事务管理 -->
+    <bean id="transactionManager5"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource5" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager5" ></tx:annotation-driven>
+    <!--sqlserver4 end -->
+
+    <!--sqlserver5 start-->
+    <bean id="dataSource6" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${DS6.jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${DS6.jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${DS6.jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${DS6.jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${DS6.jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${DS6.jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${DS6.jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${DS6.jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${DS6.jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${DS6.jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${DS6.jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${DS6.jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${DS6.jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${DS6.jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${DS6.jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${DS6.jdbc.checkoutTimeout}" /> 	<!-- 获取新连接的超时时间为10000毫秒-->
+    </bean>
+
+    <bean id="sqlSessionFactory6" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource6" />
+        <property name="mapperLocations" value="classpath:mapper/others/sqlserver5/*.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory6"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.adapter.sqlserver5.dao" />
+    </bean>
+    <!-- 事务管理 -->
+    <bean id="transactionManager6"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource6" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager6" ></tx:annotation-driven>
+    <!--sqlserver5 end -->
+
+    <!--sqlserver6 start-->
+    <bean id="dataSource7" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${DS7.jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${DS7.jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${DS7.jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${DS7.jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${DS7.jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${DS7.jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${DS7.jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${DS7.jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${DS7.jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${DS7.jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${DS7.jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${DS7.jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${DS7.jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${DS7.jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${DS7.jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${DS7.jdbc.checkoutTimeout}" /> 	<!-- 获取新连接的超时时间为10000毫秒-->
+    </bean>
+
+    <bean id="sqlSessionFactory7" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource7" />
+        <property name="mapperLocations" value="classpath:mapper/others/sqlserver6/*.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory7"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.ihefe.nurses.adapter.sqlserver6.dao" />
+    </bean>
+    <!-- 事务管理 -->
+    <bean id="transactionManager7"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource7" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager7" ></tx:annotation-driven>
+    <!--sqlserver6 end-->
+
+    <bean id="springContextUtil" class="com.ihefe.nurses.util.SpringContextUtil" />
+
+    <bean id="singleParamUtil" class="com.ihefe.nurses.util.SingleParamUtil" init-method="loadSingleParams"/>
+
+    <bean id="messageUtil" class="com.ihefe.nurses.util.MessageUtil"  init-method="loadMessageCode"></bean>
+
+
+</beans>

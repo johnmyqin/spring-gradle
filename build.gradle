@@ -1,0 +1,57 @@
+group 'SpringMVC'
+version '1.0.1'
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+ext {
+    springVersion = "4.1.1.RELEASE"
+    log4jVersion = "1.2.17"
+    mybatisVersion = "3.2.8"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+//    maven { url "http://repo1.maven.org/maven2" }
+}
+configurations.all {
+    resolutionStrategy.force(
+            "org.springframework:spring-core:${springVersion}",
+    )
+}
+dependencies {
+    dependencies {
+        compile(
+                fileTree(dir: 'src/main/webapp/libs' , include: '*.jar' )
+        )
+        compile(
+                "org.springframework:spring-core:${springVersion}",
+                "org.springframework:spring-web:${springVersion}",
+                "org.springframework:spring-oxm:${springVersion}",
+                "org.springframework:spring-webmvc:${springVersion}",
+                "org.springframework:spring-tx:${springVersion}",
+                "org.springframework:spring-aop:${springVersion}",
+                "org.springframework:spring-context:${springVersion}",
+                "org.springframework:spring-context-support:${springVersion}",
+                "org.springframework:spring-test:${springVersion}",
+                "org.springframework:spring-beans:${springVersion}",
+                "org.springframework:spring-expression:${springVersion}",
+                "org.springframework:spring-jdbc:${springVersion}",
+                "commons-dbcp:commons-dbcp:1.2.2",
+                "jstl:jstl:1.2",
+                "log4j:log4j:${log4jVersion}",
+                "org.codehaus.jackson:jackson-mapper-asl:1.9.13",
+                "junit:junit:4.11",
+                "c3p0:c3p0:0.9.1.2",
+                "org.mybatis:mybatis:${mybatisVersion}",
+                "commons-lang:commons-lang:2.6",
+                "aspectj:aspectjweaver:1.5.3",
+                "org.apache.httpcomponents:httpcore:4.3.3",
+                "aopalliance:aopalliance:1.0",
+        )
+    }
+
+}
