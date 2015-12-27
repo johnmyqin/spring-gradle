@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:lang="http://www.springframework.org/schema/lang" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:cache="http://www.springframework.org/schema/cache" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:task="http://www.springframework.org/schema/task"
        xmlns:websocket="http://www.springframework.org/schema/websocket"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -22,7 +25,9 @@
 	         http://www.springframework.org/schema/cache
 	         http://www.springframework.org/schema/cache/spring-cache.xsd
 	         http://www.springframework.org/schema/task
-	         http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+	         http://www.springframework.org/schema/task/spring-task.xsd
+	         http://www.springframework.org/schema/websocket
+	         http://www.springframework.org/schema/websocket/spring-websocket.xsd">
 
     <context:component-scan base-package="com.mo"></context:component-scan>
 
@@ -41,72 +46,72 @@
     <mvc:resources mapping="web/js/**" location="/./WEB-INF/web/js/" />
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="prefix" value="/WEB-INF/web/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!-- aop start-->
+     <!--aop start-->
     <!--Controller异常日志处理-->
-    <!--<bean id="controllerThrowsAdvice" class="com.ihefe.nurses.common.aop.ControllerThrowsAdvice" />-->
-    <!--<aop:config>-->
-        <!--<aop:advisor pointcut="execution(* com.ihefe.nurses.controller..*.*(..))"  advice-ref="controllerThrowsAdvice" />-->
-    <!--</aop:config>-->
-    <!-- aop end-->
+    <bean id="controllerThrowsAdvice" class="com.mo.common.aop.ControllerThrowsAdvice" />
+    <aop:config>
+        <aop:advisor pointcut="execution(* com.mo.controller..*.*(..))"  advice-ref="controllerThrowsAdvice" />
+    </aop:config>
+     <!--aop end-->
 
 
     <!--定时任务配置 start-->
-    <!-- 启动触发器的配置开始 -->
-    <!--<bean name="startQuertz" lazy-init="false" autowire="no"-->
-          <!--class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
-        <!--<property name="triggers">-->
-            <!--<list>-->
-                <!--<ref bean="myJobTrigger" />-->
-            <!--</list>-->
-        <!--</property>-->
-    <!--</bean>-->
-    <!--&lt;!&ndash; 启动触发器的配置结束 &ndash;&gt;-->
+     <!--启动触发器的配置开始 -->
+    <bean name="startQuertz" lazy-init="false" autowire="no"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="myJobTrigger" />
+            </list>
+        </property>
+    </bean>
+    <!-- 启动触发器的配置结束 -->
 
-    <!--&lt;!&ndash; quartz-2.x的配置 &ndash;&gt;-->
-    <!--<bean id="myJobTrigger"-->
-          <!--class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail">-->
-            <!--<ref bean="myJobDetail" />-->
-        <!--</property>-->
-        <!--<property name="cronExpression">-->
-            <!--&lt;!&ndash;一分钟触发一次&ndash;&gt;-->
-            <!--&lt;!&ndash;<value>0 0/1 * * * ?</value>&ndash;&gt;-->
-            <!--&lt;!&ndash;每天12点触发&ndash;&gt;-->
-            <!--<value>0 0 7 * * ?</value>-->
-        <!--</property>-->
-    <!--</bean>-->
-    <!--&lt;!&ndash; 调度的配置结束 &ndash;&gt;-->
+    <!-- quartz-2.x的配置 -->
+    <bean id="myJobTrigger"
+          class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="myJobDetail" />
+        </property>
+        <property name="cronExpression">
+            <!--一分钟触发一次-->
+            <!--<value>0 0/1 * * * ?</value>-->
+            <!--每天12点触发-->
+            <value>0 0 7 * * ?</value>
+        </property>
+    </bean>
+    <!-- 调度的配置结束 -->
 
-    <!--&lt;!&ndash; job的配置开始 &ndash;&gt;-->
-    <!--<bean id="myJobDetail"-->
-          <!--class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
-        <!--<property name="targetObject">-->
-            <!--<ref bean="myJob" />-->
-        <!--</property>-->
-        <!--<property name="targetMethod">-->
-            <!--<value>execute</value>-->
-        <!--</property>-->
-    <!--</bean>-->
-    <!--&lt;!&ndash; job的配置结束 &ndash;&gt;-->
+    <!-- job的配置开始 -->
+    <bean id="myJobDetail"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="myJob" />
+        </property>
+        <property name="targetMethod">
+            <value>execute</value>
+        </property>
+    </bean>
+    <!-- job的配置结束 -->
 
-    <!--&lt;!&ndash; 工作的bean &ndash;&gt;-->
-    <!--<bean id="myJob" class="com.ihefe.nurses.common.task.task1.TestJob" />-->
+    <!-- 工作的bean -->
+    <bean id="myJob" class="com.mo.common.task.task1.TestJob" />
 
-    <!--&lt;!&ndash;定时任务配置 end&ndash;&gt;-->
+    <!--定时任务配置 end-->
 
-    <!--&lt;!&ndash;websocket start&ndash;&gt;-->
-    <!--<bean id="websocket" class="com.ihefe.nurses.common.websocket.handler.WebsocketEndPoint"/>-->
+    <!--websocket start-->
+    <bean id="websocket" class="com.mo.common.websocket.handler.WebsocketEndPoint"/>
 
-    <!--<websocket:handlers>-->
-        <!--<websocket:mapping path="/websocket" handler="websocket"/>-->
-        <!--<websocket:handshake-interceptors>-->
-            <!--<bean class="com.ihefe.nurses.common.websocket.HandshakeInterceptor"/>-->
-        <!--</websocket:handshake-interceptors>-->
-    <!--</websocket:handlers>-->
-    <!--&lt;!&ndash;websocket end&ndash;&gt;-->
+    <websocket:handlers>
+        <websocket:mapping path="/websocket" handler="websocket"/>
+        <websocket:handshake-interceptors>
+            <bean class="com.mo.common.websocket.HandshakeInterceptor"/>
+        </websocket:handshake-interceptors>
+    </websocket:handlers>
+    <!--websocket end-->
 
 </beans>
