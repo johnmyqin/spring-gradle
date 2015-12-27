@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @version 1.0.1
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(value = { "name" })
+//@JsonIgnoreProperties(value = { "name" })
 public class UserBean {
     private Integer userId;
     private String userName;
