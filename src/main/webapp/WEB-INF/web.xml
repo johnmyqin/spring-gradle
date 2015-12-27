@@ -4,7 +4,7 @@
 		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 		 version="3.0">
 
-	<display-name>Ih_nurses</display-name>
+	<display-name>Spring-MVC</display-name>
 
 	<!-- Spring和mybatis的配置文件 -->
 	<context-param>
@@ -12,8 +12,6 @@
 		<param-value>classpath:spring-mybatis.xml</param-value>
 	</context-param>
 	<!-- 编码过滤器 -->
-
-
 
 	<filter>
 		<filter-name>encodingFilter</filter-name>
@@ -32,10 +30,6 @@
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
-
-
-
 
 	<!-- Spring监听器 -->
 	<listener>
@@ -59,7 +53,6 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>SpringMVC</servlet-name>
-		<!-- 此处可以可以配置成*.do，对应struts的后缀习惯 -->
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
@@ -74,9 +67,4 @@
 	<welcome-file-list>
 		<welcome-file>/hello.jsp</welcome-file>
 	</welcome-file-list>
-
-	<!-- 配置SESSION超时，单位是分钟 -->
-	<!--<session-config>
-		<session-timeout>60</session-timeout>
-	</session-config>-->
 </web-app>

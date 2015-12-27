@@ -1,4 +1,4 @@
-group 'SpringMVC'
+group 'Spring-MVC'
 version '1.0.1'
 
 apply plugin: 'java'
@@ -13,7 +13,7 @@ ext {
 }
 
 repositories {
-    mavenLocal()
+//    mavenLocal()
 //    mavenCentral()
 //    maven { url "http://gradle.artifactoryonline.com/gradle/libs/" }
 }
@@ -26,6 +26,7 @@ dependencies {
     dependencies {
         compile(
                 fileTree(dir: 'libs' , include: '*.jar' )
+//                fileTree(dir: 'src/main/webapp/lib' , include: '*.jar' )
         )
         compile(
 //                "org.springframework:spring-core:${springVersion}",
