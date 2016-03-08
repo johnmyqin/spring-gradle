@@ -1,2 +1,5 @@
 rootProject.name = 'spring'
-
+include 'framework'
+project(':framework').projectDir = new File('framework/framework')
+include 'core'
+project(':core').projectDir = new File('core/core')
