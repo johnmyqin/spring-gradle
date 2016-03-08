@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd
+	         http://www.springframework.org/schema/tx
+ 			 http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+ 			 http://www.springframework.org/schema/context
+ 			 http://www.springframework.org/schema/context/spring-context.xsd
+ 			 http://www.springframework.org/schema/data/mongo
+ 			 http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+
+    <!-- 引入配置文件 -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:database.properties" />
+    </bean>
+
+
+    <!-- monogo start-->
+    <mongo:mongo host="${mongodb.host}" port="${mongodb.port}" />
+    <!--<mongo:db-factory dbname="${mongodb.database}" />-->
+    <mongo:db-factory id="mongoDbFactory" dbname="${mongodb.database}"
+                      mongo-ref="mongo" username="${mongodb.username}" password="${mongodb.password}" />
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+    </bean>
+
+    <!-- MongoDB GridFS Template 支持，操作mongodb存放的文件 -->
+    <mongo:mapping-converter id="converter" db-factory-ref="mongoDbFactory"/>
+    <bean id="gridFsTemplate" class="org.springframework.data.mongodb.gridfs.GridFsTemplate">
+        <constructor-arg ref="mongoDbFactory"/>
+        <constructor-arg ref="converter"/>
+    </bean>
+    <bean id="fileOperation" class="com.moxingwang.file.gridfs.GridFSOperation" />
+    <!-- mongo end-->
+
+
+    <!-- redis config start -->
+    <bean id = "jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <property name="hostName" value="${redis.host}"/>
+        <property name="port" value="${redis.port}"/>
+        <property name="timeout" value="${redis.timeout}"/>
+        <!-- <property name="password" value="${redis.password}"/> -->
+    </bean>
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <property name="minIdle" value="${redis.pool.minIdle}"/>
+        <property name="maxWaitMillis" value="${redis.pool.maxWait}"/>
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+        <property name="testOnReturn" value="${redis.pool.testOnReturn}"/>
+    </bean>
+
+    <bean id = "redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"/>
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean>
+        </property>
+    </bean>
+    <!-- redis config end -->
+
+    <!-- user center start -->
+    <bean id="dataSourceUC" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close" >
+        <property name="driverClass" value="${jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${jdbcuc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${jdbcuc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${jdbcuc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${jdbcuc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${jdbcuc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${jdbcuc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${jdbcuc.maxPoolSize}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="100" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="3600" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="2" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="5" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="600" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="true" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="1200" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="10000" />		<!-- 获取新连接的超时时间为10000毫秒 -->
+        <property name="maxConnectionAge" value="600" />		<!-- 配置连接的生存时间为600秒 -->
+        <property name="maxIdleTimeExcessConnections" value="60" />		<!-- 60秒 -->
+    </bean>
+
+    <bean id="transactionManagerUC"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSourceUC" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManagerUC" ></tx:annotation-driven>
+
+    <bean id="sqlSessionFactoryUC" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSourceUC" />
+        <property name="mapperLocations" value="classpath:dependencies/core/**/*.xml" />
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryUC"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.moxingwang.uc.dao.*" />
+    </bean>
+    <!-- user center end-->
+
+    <!-- mysql start -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClass}" />		<!-- 数据库驱动 -->
+        <property name="jdbcUrl" value="${jdbc.url}" />		<!-- 连接URL串 -->
+        <property name="user" value="${jdbc.user}" />		<!-- 连接用户名 -->
+        <property name="password" value="${jdbc.password}" />		<!-- 连接密码 -->
+        <property name="initialPoolSize" value="${jdbc.initialPoolSize}" />		<!-- 初始化连接池时连接数量为5个 -->
+        <property name="minPoolSize" value="${jdbc.minPoolSize}" />		<!-- 允许最小连接数量为5个 -->
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}" />		<!-- 允许最大连接数量为20个 -->
+        <property name="numHelperThreads" value="${jdbc.numHelperThreads}" />			<!-- 允许最大连接数量为20个 -->
+        <property name="maxStatements" value="${jdbc.maxStatements}" />		<!-- 允许连接池最大生成100个PreparedStatement对象 -->
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}" />		<!-- 连接有效时间，连接超过3600秒未使用，则该连接丢弃 -->
+        <property name="acquireIncrement" value="${jdbc.acquireIncrement}" />		<!-- 连接用完时，一次产生的新连接步进值为2 -->
+        <property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}" />		<!-- 获取连接失败后再尝试10次，再失败则返回DAOException异常 -->
+        <property name="acquireRetryDelay" value="${jdbc.acquireRetryDelay}" />		<!-- 获取下一次连接时最短间隔600毫秒，有助于提高性能 -->
+        <property name="testConnectionOnCheckin" value="${jdbc.testConnectionOnCheckin}" />		<!-- 检查连接的有效性，此处小弟不是很懂什么意思 -->
+        <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}" />		<!-- 每个1200秒检查连接对象状态 -->
+        <property name="checkoutTimeout" value="${jdbc.checkoutTimeout}" />		<!-- 获取新连接的超时时间为10000毫秒 -->
+    </bean>
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" ></tx:annotation-driven>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath:mapper/mysql/**/*.xml" />
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" />
+        <property name="basePackage" value="com.moxingwang.nurses.dao.*" />
+    </bean>
+    <!-- mysql end-->
+
+
+</beans>

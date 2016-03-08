@@ -1,0 +1,12 @@
+apply plugin: "java"
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+archivesBaseName = 'framework'
+
+dependencies {
+    dependencies {
+        compile(
+                fileTree(dir: 'libs', include: '*.jar')
+        )
+    }
+}
